@@ -1,13 +1,20 @@
 const path = require('path');
-const autoprefixer = require('autoprefixer')
+const autoprefixer = require('autoprefixer');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     devtool: 'cheap-module-eval-source-map',
+    devServer: {
+        port: 9000,
+        compress: true,
+        historyApiFallback: true
+    },
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
-        publicPuth: ''
+        chunkFilename: '[id].js',
+        publicPath: ''
     },
     resolve: {
         extensions: ['.js', '.jsx']
@@ -21,13 +28,13 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                exclude: /mode_modules/,
+                exclude: /node_modules/,
                 use: [
                     {loader: 'style-loader'},
                     {
                         loader: 'css-loader',
-                        importLoaders: 1, 
-                        options: {
+                        options: {                            
+                            importLoaders: 1, 
                             modules: true,
                             localIdentName: '[name]__[local]__[hash:base64:5]'
                         }
@@ -39,15 +46,26 @@ module.exports = {
                             plugins: () => [
                                 autoprefixer({
                                     browsers: [
-                                        ">1 %",
-                                        "last 2 verisons"
+                                        "> 1%",
+                                        "last 2 versions"
                                     ]
                                 })
                             ]
                         }
                     }
                 ] 
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/,
+                loader: 'url-loader?limit=8000&name=images/[name].[ext]'
             }
         ]
-    }
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: __dirname + '/src/index.html',
+            filename: 'index.html',
+            inject: 'body'
+        })
+    ]
 };
